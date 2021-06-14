@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SignalRApplication.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,25 @@ namespace SignalRApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //CORS1
+            services.AddCors(opt => opt.AddDefaultPolicy(
+                policy =>
+                    policy.AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .SetIsOriginAllowed(origin => true)
+            ));
             services.AddRazorPages();
+            services.AddSignalR();
+
+            //services.AddCors(options =>
+            //{
+            //    options.AddDefaultPolicy(builder =>
+            //    {
+            //        builder.WithOrigins("https://example.com")
+            //            .AllowCredentials();
+            //    });
+            //});
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,18 +58,25 @@ namespace SignalRApplication
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            app.UseHttpsRedirection();
+            //CORS2
+            app.UseCors();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+
+                //https://localhost:5001/myhub
+                endpoints.MapHub<MyHub>("/myhub");
+                //myhub isteði geliyorsa MyHub tarafýndan karþýlanacak.
             });
+
+          
         }
     }
 }

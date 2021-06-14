@@ -1,0 +1,1 @@
+--SignalR i tanýtmamýz ve hangi endpointi kullanacaðýmýzý bildirmemiz gerekiyor.
