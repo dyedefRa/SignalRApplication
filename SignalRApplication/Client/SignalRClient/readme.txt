@@ -1,1 +1,2 @@
 npm i jquery @microsoft/signalr indirdik
+
