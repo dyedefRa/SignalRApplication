@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SignalRApplication.Business;
 using SignalRApplication.Hubs;
 using System;
 using System.Collections.Generic;
@@ -32,9 +33,11 @@ namespace SignalRApplication
                     .AllowCredentials()
                     .SetIsOriginAllowed(origin => true)
             ));
+
             services.AddRazorPages();
             services.AddSignalR();
-
+            services.AddControllers();
+            services.AddTransient<MyBusiness>();
             //services.AddCors(options =>
             //{
             //    options.AddDefaultPolicy(builder =>
@@ -73,6 +76,8 @@ namespace SignalRApplication
 
                 //https://localhost:5001/myhub
                 endpoints.MapHub<MyHub>("/myhub");
+
+                endpoints.MapControllers();
                 //myhub isteði geliyorsa MyHub tarafýndan karþýlanacak.
             });
 

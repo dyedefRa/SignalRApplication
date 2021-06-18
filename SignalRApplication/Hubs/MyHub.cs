@@ -17,12 +17,12 @@ namespace SignalRApplication.Hubs
         //alttakı methodu cagıracagız.
         //alttakı method ıse clienttaki receiveMessageOnClient methodu cagıracak
         //receıve meyhodu da degısıklıklerı clıenttan clıentalara verecek.
-        public async Task SendMessageAsync(string message)
-        {
-            //Clienttaki hangi methodu tetikleyecegim
-            await Clients.All.SendAsync("receiveMessageOnClient", message);
-            //receive metodu append yapıyor
-        }
+        //public async Task SendMessageAsync(string message)
+        //{
+        //    //Clienttaki hangi methodu tetikleyecegim
+        //    await Clients.All.SendAsync("receiveMessageOnClient", message);
+        //    //receive metodu append yapıyor
+        //}
 
         //Bağlantı olayları 
         //bir client bağlandığında burayı tetikler.
