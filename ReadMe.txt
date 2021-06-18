@@ -12,3 +12,11 @@
  Startup.cs >
   endpoints.MapControllers();
   services.AddControllers();
+
+   ----------------------------
+
+Strongly Type Hubs>
+
+Bunun için IMessageClient olusturduk ve kullandýgýmýz , clientta yakalamaya calýstýgýmýz methodlarý ekledik
+metodlarý clientta yada serverda yazarken yanlýþ yazýmlarý önlemek için kullanýyoruz.
+ilgili Hubta >  '  public class MyHub : Hub<IMessageClient> ' yazarak metodlarýna eriþecegiz
