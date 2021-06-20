@@ -76,7 +76,7 @@ namespace SignalRApplication
 
                 //https://localhost:5001/myhub
                 endpoints.MapHub<MyHub>("/myhub");
-
+                endpoints.MapHub<MessageHub>("/messagehub");
                 endpoints.MapControllers();
                 //myhub isteði geliyorsa MyHub tarafýndan karþýlanacak.
             });

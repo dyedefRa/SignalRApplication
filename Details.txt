@@ -1,0 +1,15 @@
+*Client türleri
+-All
+-Other
+-Caller
+
+*Hub Clients Metotlarý
+-AllExcept > Belirtilen clientlar hariç tüm clientlara bildirimde bulunur.
+-Client
+-Clients
+-Group
+-GroupExcept
+-Groups
+-OthersInGroup
+-User
+-Users
