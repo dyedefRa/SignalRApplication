@@ -21,6 +21,9 @@
     <hr>
 
     <input type="text" placeholder="Mesaj" id="txtMessage">
+    <!-- Alttaki inputu Groups örnegi için yazdık. Birden fazla grup ısmı alacagız ve Bu guruplara göderecegız -->
+    <input type="text" placeholder="Gönderilecek grupları yazın" id="txtGroupNames">
+
     <br>
     <br>
     <button id="btnSend">Mesaj Gönder</button>
@@ -57,12 +60,37 @@
         $('#btnSend').click(() => {
             let message = $('#txtMessage').val();
             let connectionIds = $('#connectionIds').val().split(',');
-            //Grup ornegı ıcın olusturuldu. Clienta grup sectırırken sadece o gruba gonderelım
-            console.log(groupName);
-            connection.invoke("SendMessageAsync", message, groupName)
-                // connection.invoke("SendMessageAsync", message, connectionIds)
-                .catch(err =>
-                    console.log(`Mesaj gönderilirken hata oluştu.${err}`));
+
+            //G1 Grup ornegı ıcın olusturuldu. Clienta grup sectırırken sadece o gruba gonderelım
+            // console.log(groupName);
+            // connection.invoke("SendMessageAsync", message, groupName)
+            //G2 aradakileri aç
+
+            //GE1
+            //GroupExcept methodu için hem grup ismi hemde connectionıd gerekıyor.
+            //belirtilen gruptaki belirtilen conn.Id. haricindeki tüm clientlara gonderır.
+            //Odadaki birini engellmeek gibi.
+            // connection.invoke("SendMessageAsync", message, groupName, connectionIds)
+            //GE2
+
+            //GROUPS1
+            // Birden fazla gruptaki clienta bildirim gonderır
+            //Bu örnegi kullnaabılrmek ıcın ustte yenı bır ınput ekledık.(txtGroupNames)
+            // let groupNames = $("#txtGroupNames").val().split(",");
+            // connection.invoke("SendMessageAsync", message, groupNames)
+            //GROUPS2
+
+            //OthersInGroup1
+            // Birden fazla gruptaki clienta bildirim gonderır
+            //Bu örnegi kullnaabılrmek ıcın ustte yenı bır ınput ekledık.(txtGroupNames)
+            let groupNames = $("#txtGroupNames").val();
+            connection.invoke("SendMessageAsync", message, groupNames)
+                //OthersInGroup2
+
+            //Gruptan önceki orneklerde alttaki method açık.
+            // connection.invoke("SendMessageAsync", message, connectionIds)
+            .catch(err =>
+                console.log(`Mesaj gönderilirken hata oluştu.${err}`));
             // clienttan serverdaki methoda erişiyoruz
 
         });
