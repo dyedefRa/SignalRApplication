@@ -8,8 +8,10 @@ namespace SignalRApplication.Hubs
 {
     public class MessageHub : Hub
     {
-        public async Task SendMessageAsync(string message, IEnumerable<string> connectionIds)
-        {
+        //clienttan tetiklenen methodumuz bu.
+        //Aynı zamanda bu method clienttaki methodu tetikler.
+        //public async Task SendMessageAsync(string message, IEnumerable<string> connectionIds)
+        //{
             #region CLIENT TURLERI
 
             #region All
@@ -32,10 +34,30 @@ namespace SignalRApplication.Hubs
             #region AllExcept
             //Belirtilen clientlar hariç tüm clientlara bildirimde bulunur.
 
-            await Clients.AllExcept(connectionIds).SendAsync("receiveMessageOnClient", message);
-
+            //await Clients.AllExcept(connectionIds).SendAsync("receiveMessageOnClient", message);
             #endregion
+            #region Client
+            //Sadece ConnectionId ile Belirtilen clienta bildirim gönderir.
+            //Whatsapptaki bir kişiye mesaj atmak bununla yapılır.
 
+            //await Clients.Client(connectionIds.FirstOrDefault()).SendAsync("receiveMessageOnClient", message);
+            #endregion
+            #region Clients
+            //Sadece ConnectionId ile Belirtilen clientlara bildirim gönderir.
+            //Whatsapptaki toplu mesaj atmak bununla yapılır.
+
+            //await Clients.Clients(connectionIds).SendAsync("receiveMessageOnClient", message);
+            #endregion
+            #region Group
+            //Belirtilen gruptaki tüm clientlara bildirimde bulunur.
+            //Tabiki ilgili grupu oluşturmamız gerekıyor (addGroup methodunu olusturduk)
+            //öncesinde ilgili clienta group sectırdık. ve butona bastıgında addGroup fonk calıstı.Ardından alttaki method Group.SendAsync
+            //methodu ile grouptaki clientlara mesaj gonderdık.
+            //Group name lazım old. için. 
+            public async Task SendMessageAsync(string message, string groupName)
+            {
+                await Clients.Group(groupName).SendAsync("receiveMessageOnClient", message);
+            #endregion
             #endregion
         }
 
@@ -43,6 +65,13 @@ namespace SignalRApplication.Hubs
         public async override Task OnConnectedAsync()
         {
             await Clients.Caller.SendAsync("receiveConnectionId", Context.ConnectionId);
+        }
+
+        //Clientın radioButon ile seçtigi Grubu bu method ile serverda yakalıyoruz.İlgili clienti o gruba ekliyoruz.
+
+        public async Task addGroup(string connectionId, string groupName)
+        {
+            await Groups.AddToGroupAsync(connectionId, groupName);
         }
     }
 }

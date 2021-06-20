@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="status"></div>
+    <input type="text" id="txtMessage">
+    <button id="btnSend">Gönder</button>
+    <div id="message"></div>
+    <div>
+        <ul id="clientList">
+
+        </ul>
+    </div>
+</body>
+<script src="signalr.min.js"></script>
+<script src="jquery.min.js"></script>
+<script>
+    $(document).ready(() => {
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:44326/myhub")
+            .withAutomaticReconnect([1000, 1000, 2000, 5000]) //0  2  10 30 sn de dener . baglanmazsa daha fazla denemez.
+            .build();
+
+        // bağlantı saglanıp sonradan koparsa bağlantı talebinde bulunur => withAutomaticReconnect
+
+        // bağlantı hiç kurulmadığında bu fonk kullanılır. Bağlanmaya zorlar.
+        async function canStart() {
+            try {
+                await connection.start();
+            } catch (error) {
+                setTimeout(() => canStart(), 2000);
+            }
+        }
+        canStart();
+
+        function myAnimate() {
+            divStatus.fadeIn(2000, () => {
+                divStatus.fadeOut(2000);
+            }, 2000);
+        }
+        //--------------------------------------------
+        //Connect örnegi > Bu methodlar  connection nesne üzerinden geliyor.
+        const divStatus = $('#status');
+        //***CLİENTA özel bağlantı yakalama
+        //Yeniden bağlantı talebi yapılmadan önce tetiklenir.
+        connection.onreconnecting(error => {
+            divStatus.css("background-color", "blue");
+            divStatus.css("color", "white");
+            divStatus.html("Bağlantı kuruluyor...");
+            myAnimate();
+        });
+
+        //Yeniden bağlantı gerçekleştiğinde tetiklenir.
+        connection.onreconnected(connectionId => {
+            divStatus.css("background-color", "green");
+            divStatus.css("color", "white");
+            divStatus.html("Bağlantı kuruldu...");
+            myAnimate();
+        });
+
+        //Yeniden bağlantı girişiminin sonuçsuz kaldığı durumlarda tetiklenir.
+        connection.onclose(connectionId => {
+            divStatus.css("background-color", "red");
+            divStatus.css("color", "white");
+            divStatus.html("Bağlanılamadı...");
+            myAnimate();
+        });
+
+        //--------------------------------------------
+
+        //Bir kullanıcı katıldığında override ile server dan clienta bu metodu tetikletiriz.
+        connection.on("userJoined", connectionId => {
+            divStatus.html(`${connectionId} bağlandı.`);
+            divStatus.css("background-color", "green");
+            myAnimate();
+        });
+
+        connection.on("userLeaved", connectionId => {
+            divStatus.html(`${connectionId} ayrıldı.`);
+            divStatus.css("background-color", "red");
+            myAnimate();
+        });
+
+        //--------------------------------------------
+
+        //yeni bir bağlantı oldugunda yada çıkış yapıldıgında ilgili clientları getır.
+        connection.on("getHubClients", clientsList => {
+            let text = "";
+            $.each(clientsList, (index, item) => {
+                text += `<li>${item}</li>`;
+            });
+            $("#clientList").html(text);
+        })
+
+        $('#btnSend').click(() => {
+            //bu methodla serverdaki methodu çalıştırıyoruz.Serverdaki methodda  , clienttaki receiveMessageOnClient methodu calıstıyor.
+            let message = $('#txtMessage').val();
+            console.log(message);
+            connection.invoke("SendMessageAsync", message)
+                .catch(err =>
+                    console.log(`Mesaj gönderilirken hata oluştu.${err}`));
+            // clienttan serverdaki methoda erişiyoruz
+
+        });
+
+        connection.on("receiveMessageOnClient", message => {
+            console.log('success');
+            $("#message").append(message + "<br>");
+        });
+
+    });
+</script>
+
+</html>

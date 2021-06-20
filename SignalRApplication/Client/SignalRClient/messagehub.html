@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Client Id lere göre mesaj göderecegız. -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <div style="background-color: black;color: white;" id="connectionId"></div>
+
+    <input type="radio" name="grup" value="A">A
+    <input type="radio" name="grup" value="B">B
+    <input type="radio" name="grup" value="C">C
+    <br>
+    <button id="btnJoinGroup">Gruba Katıl</button>
+    <hr>
+
+    <input type="text" placeholder="Mesaj" id="txtMessage">
+    <br>
+    <br>
+    <button id="btnSend">Mesaj Gönder</button>
+    <br>
+    <hr>
+    <textarea name="" id="connectionIds" placeholder="ConnectionId" cols="30" rows="10"></textarea>
+
+    <div id="message"></div>
+
+</body>
+<script src="signalr.min.js"></script>
+<script src="jquery.min.js"></script>
+<script>
+    $(document).ready(() => {
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("https://localhost:44326/messagehub")
+            .withAutomaticReconnect([1000, 1000, 2000, 5000]) //0  2  10 30 sn de dener . baglanmazsa daha fazla denemez.
+            .build();
+
+        // bağlantı saglanıp sonradan koparsa bağlantı talebinde bulunur => withAutomaticReconnect
+        // bağlantı hiç kurulmadığında bu fonk kullanılır. Bağlanmaya zorlar.
+        async function canStart() {
+            try {
+                await connection.start();
+            } catch (error) {
+                setTimeout(() => canStart(), 2000);
+            }
+        }
+        canStart();
+        let myConnectionId = "";
+        let groupName = "";
+        //Mesaj ve connectionIds gondersin.
+        $('#btnSend').click(() => {
+            let message = $('#txtMessage').val();
+            let connectionIds = $('#connectionIds').val().split(',');
+            //Grup ornegı ıcın olusturuldu. Clienta grup sectırırken sadece o gruba gonderelım
+            console.log(groupName);
+            connection.invoke("SendMessageAsync", message, groupName)
+                // connection.invoke("SendMessageAsync", message, connectionIds)
+                .catch(err =>
+                    console.log(`Mesaj gönderilirken hata oluştu.${err}`));
+            // clienttan serverdaki methoda erişiyoruz
+
+        });
+
+        //Grup ornegi için oluşturduk.Clienti Radio butondan gruba sectiriyoruz.
+        $("#btnJoinGroup").click(() => {
+            groupName = $("input[name=grup]:checked").val();
+            console.log(myConnectionId);
+            console.log(groupName);
+            connection.invoke("addGroup", myConnectionId, groupName)
+                .catch(err =>
+                    console.log(`Gruba katılırken hata oluştu.${err}`));
+        })
+
+        connection.on("receiveMessageOnClient", message => {
+            console.log('success');
+            $("#message").append(message + "<br>");
+        });
+
+        //----------------- YENI MessageHubMetodları-----------------
+        //Kendi connectionıdlerini görsün client.
+        connection.on("receiveConnectionId", connectionId => {
+            myConnectionId = connectionId
+            $("#connectionId").html(`${connectionId} katıldınız.`);
+        });
+
+
+    });
+</script>
+
+</html>

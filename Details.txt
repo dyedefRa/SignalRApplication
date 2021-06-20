@@ -1,3 +1,4 @@
+MessageHub.cs de detaylý açýklamalar mevcut.
 *Client türleri
 -All
 -Other
@@ -5,8 +6,9 @@
 
 *Hub Clients Metotlarý
 -AllExcept > Belirtilen clientlar hariç tüm clientlara bildirimde bulunur.
--Client
--Clients
+-Client > Sadece ConnectionId ile Belirtilen clienta bildirim gönderir.
+-Clients >Sadece ConnectionId ile Belirtilen clientlara bildirim gönderir.
+            //Whatsapptaki toplu mesaj atmak bununla yapýlýr.
 -Group
 -GroupExcept
 -Groups
